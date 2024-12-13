@@ -1,43 +1,54 @@
+def input_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyError:
+            return "Contact not found."
+        except ValueError:
+            return "Give me name and phone please."
+        except IndexError:
+            return "Invalid input. Please provide all required arguments."
+    return inner
+
 def parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
     return cmd, args
 
-
+@input_error
 def add_contact(args, contacts):
     if len(args) != 2:
-        return "Invalid format. Use: add [name] [phone]"
+        raise ValueError
     name, phone = args
     contacts[name] = phone
     return "Contact added."
 
-
+@input_error
 def change_contact(args, contacts):
     if len(args) != 2:
-        return "Invalid format. Use: change [name] [new phone]"
+        raise ValueError
     name, phone = args
     if name in contacts:
         contacts[name] = phone
         return "Contact updated."
     else:
-        return "Contact not found."
+        raise KeyError
 
-
+@input_error
 def show_phone(args, contacts):
     if len(args) != 1:
-        return "Invalid format. Use: phone [name]"
+        raise ValueError
     name = args[0]
     if name in contacts:
         return f"{name}: {contacts[name]}"
     else:
-        return "Contact not found."
+        raise KeyError
 
-
+@input_error
 def show_all(contacts):
     if not contacts:
         return "No contacts found."
     return "\n".join(f"{name}: {phone}" for name, phone in contacts.items())
-
 
 def main():
     contacts = {}
@@ -62,7 +73,6 @@ def main():
             print(show_all(contacts))
         else:
             print("Invalid command. Please try again.")
-
 
 if __name__ == "__main__":
     main()
