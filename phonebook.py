@@ -1,3 +1,4 @@
+import pickle
 from collections import UserDict
 from datetime import datetime, timedelta
 
@@ -126,6 +127,18 @@ class AddressBook(UserDict):
                     })
         return upcoming
 
+# Serialization and Deserialization Methods
+def save_data(book, filename="addressbook.pkl"):
+    with open(filename, "wb") as f:
+        pickle.dump(book, f)
+
+def load_data(filename="addressbook.pkl"):
+    try:
+        with open(filename, "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return AddressBook()
+
 @input_error
 def add_contact(args, book: AddressBook):
     name, phone, *_ = args
@@ -169,7 +182,7 @@ def birthdays(_, book: AddressBook):
     return result.strip()
 
 def main():
-    book = AddressBook()
+    book = load_data()
     print("Welcome to the assistant bot!")
     while True:
         user_input = input("Enter a command: ")
@@ -177,6 +190,7 @@ def main():
         args = args[0].split() if args else []
 
         if command in ["close", "exit"]:
+            save_data(book)
             print("Good bye!")
             break
 
